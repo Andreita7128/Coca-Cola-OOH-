@@ -1,16 +1,27 @@
 class Button {
-    constructor(x, y) {
+    constructor(x, y, image) {
         this.x = x;
         this.y = y;
+        this.image = image;
         this.size = 60;
     }
 
     show() {
-        circle(this.x, this.y, this.size);
+        imageMode(CENTER);
+        image(this.image, this.x, this.y);
+        imageMode(CORNER);
+    }
+
+    show2() {
+        image(this.image, this.x, this.y);
     }
 
     click() {
         return dist(this.x, this.y, mouseX, mouseY) < this.size / 2
+    }
+
+    click2(b, h) {
+        return mouseX > this.x && mouseX < (this.x + b) && mouseY > this.y && mouseY < (this.y + h);
     }
 }
 
@@ -24,11 +35,29 @@ let positionX, positionY = 0;
 let move = null;
 let isTouched = false;
 let addPos = 70;
+let play;
+let playI;
+let playPress = false;
 let up;
+let upI;
 let down;
+let downI;
 let right;
+let rightI;
 let left;
-let screen = 1;
+let leftI;
+let screenMobile = 0;
+
+let nameInput;
+let lastNameInput;
+let phoneInput;
+let send;
+let sendI;
+
+let mark;
+let cocacola;
+
+let userdata = {name: undefined, lastName: undefined, phone: undefined};
 
 function setup() {
     frameRate(12);
@@ -42,10 +71,22 @@ function setup() {
     background(0);
     angleMode(DEGREES);
 
-    up = new Button(positionX, positionY - addPos);
-    down = new Button(positionX, positionY + addPos);
-    left = new Button(positionX - addPos, positionY);
-    right = new Button(positionX + addPos, positionY);
+    playI = loadImage('images/play.png');
+    upI = loadImage('images/up.png');
+    downI = loadImage('images/down.png');
+    leftI = loadImage('images/left.png');
+    rightI = loadImage('images/right.png');
+    sendI = loadImage('images/send.png')
+
+    play = new Button(positionX - 53, positionY, playI)
+    up = new Button(positionX, positionY - addPos, upI);
+    down = new Button(positionX, positionY + addPos, downI);
+    left = new Button(positionX - addPos, positionY, leftI);
+    right = new Button(positionX + addPos, positionY, rightI);
+    send = new Button(positionX - 53, positionY + addPos, sendI);
+
+    mark = loadImage('images/markMobile.png');
+    cocacola = loadImage('images/logoMobile.png');
 
 
     socket.emit('device-size', {
@@ -53,18 +94,39 @@ function setup() {
         windowHeight
     });
 
+    nameInput = createInput('');
+    nameInput.position(windowWidth / 2 - 100, windowHeight / 2 - 115);
+    nameInput.size(200);
+    nameInput.input(nameEvent);
+    nameInput.style('display', 'none');
+
+    lastNameInput = createInput('');
+    lastNameInput.position(windowWidth / 2 - 100, windowHeight / 2 - 50);
+    lastNameInput.size(200);
+    lastNameInput.input(lastNameEvent);
+    lastNameInput.style('display', 'none');
+
+    phoneInput = createInput('');
+    phoneInput.position(windowWidth / 2 - 100, windowHeight / 2 + 15);
+    phoneInput.size(200);
+    phoneInput.input(phoneEvent);
+    phoneInput.style('display', 'none');
+
 }
 
 function draw() {
     background(0, 5);
     fill(254, 0, 26);
-    console.log(screen);
+    console.log(screenMobile);
+    fill(255);
+    noStroke();
+    rect(0, 0, windowWidth, windowHeight)
+    image(mark, 0, windowHeight/2 + 150,windowWidth);
+    image(cocacola, windowWidth/2 + 100, windowHeight/2 + 200)
 
-    switch (screen) {
+    switch (screenMobile) {
         case 0:
-            setTimeout(() => {
-                screen = 1;
-            }, 5000)
+            play.show2();
             break;
 
         case 1:
@@ -74,18 +136,55 @@ function draw() {
             left.show();
             break;
 
-    }
+        case 2:
+            textSize(20)
+            fill(10);
+            text('Nombre', windowWidth / 2 - 100, windowHeight / 2 - 122);
+            text('Apellido', windowWidth / 2 - 100, windowHeight / 2 - 57);
+            text('Celular', windowWidth / 2 - 100, windowHeight / 2 + 7);
+            nameInput.style('display', 'block');
+            lastNameInput.style('display', 'block');
+            phoneInput.style('display', 'block');
+            if(userdata.name !== undefined && userdata.lastName !== undefined && userdata.phone !== undefined){
+                send.show2();
+            }
 
+            break;
+    }
+}
+
+function nameEvent() {
+    userdata.name = this.value();
+}
+
+function lastNameEvent() {
+    userdata.lastName = this.value();
+}
+
+function phoneEvent() {
+    userdata.phone = this.value();
 }
 
 function touchStarted() {
     isTouched = true;
+    if (screenMobile === 0 && play.click2(107, 41)) {
+        playPress = true;
+    }
+    if (screenMobile === 0 && playPress) {
+        screenMobile++;
+        socket.emit('press-play', {
+            playPress
+        })
+    }
+    if(screenMobile === 2 && send.click2(107,41)){
+
+    }
 }
 
 function touchEnded() {
     isTouched = false;
 
-    if (screen === 1) {
+    if (screenMobile === 1) {
         if (up.click()) {
             move = 'up';
         } else if (down.click()) {
@@ -100,3 +199,12 @@ function touchEnded() {
         });
     }
 }
+
+socket.on('data-screen', instructions => {
+    let {
+        data
+    } = instructions;
+    if (data) {
+        screenMobile = 2;
+    }
+})

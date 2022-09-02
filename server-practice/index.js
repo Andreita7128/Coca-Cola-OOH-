@@ -26,6 +26,15 @@ io.on('connection', (socket) => {
         console.log(move);
         socket.broadcast.emit('mupi-instructions', move);
     })
+
+    socket.on('press-play', playPress => {
+        socket.broadcast.emit('press-play', playPress);
+    })
+
+    socket.on('data-screen', data => {
+        console.log(data);
+        socket.broadcast.emit('data-screen', data);
+    })
 })
 
 

@@ -1,45 +1,48 @@
 class Level {
-    constructor(size) {
+    constructor(size, mapTiles, rightAnswer, answ2, answ3) {
         this.level = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 2, 0, 1, 1, 0, 3, 0, 1],
-            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-            [1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
-            [1, 1, 1, 0, 0, 3, 0, 0, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 2, 0, 1, 1, 1, 0, 3, 0, 1],
+            [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 0, 0, 4, 0, 0, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ]
         this.size = size;
+        this.mapTiles = mapTiles;
+        this.rightAnswer = rightAnswer;
+        this.answ2 = answ2;
+        this.answ3 = answ3;
     }
 
     show() {
         for (let i = 0; i < 15; i++) {
-            for (let j = 0; j < 10; j++) {
+            for (let j = 0; j < 11; j++) {
                 if (this.level[i][j] === 0) {
-                    fill(255)
-                    stroke(10)
-                }
-                if (this.level[i][j] === 2) {
-                    fill(10, 200, 10);
+                    image(this.mapTiles,(j * this.size) + 27, (i * this.size));
+                } else if (this.level[i][j] === 2) {
+                    image(this.rightAnswer,(j * this.size) + 27, (i * this.size));
                 } else if (this.level[i][j] === 3) {
-                    fill(180, 10, 10);
-                } else if (this.level[i][j] === 1) {
-                    fill(10)
-                    stroke(255)
-                    //noStroke();
+                    image(this.answ2,(j * this.size) + 27, (i * this.size));
+                } else if (this.level[i][j] === 4) {
+                    image(this.answ3,(j * this.size) + 27, (i * this.size));
                 }
-
-                rect((j * this.size), (i * this.size), this.size)
+                 else {
+                    noStroke();
+                }
+                fill(255,0);
+                stroke(10)
+                rect((j * this.size) + 27, (i * this.size), this.size)
             }
-
         }
     }
 
@@ -54,9 +57,11 @@ class Level {
     }
 
     win(pcFil, pcCol) {
-        let result = false;
+        let result = null;
         if (this.level[pcCol][pcFil] === 2) {
             result = true;
+        } else if(this.level[pcCol][pcFil] !== 0 && this.level[pcCol][pcFil] !== 2){
+            result = false;
         }
         return result;
     }
@@ -68,50 +73,18 @@ class Player {
         this.fil = fil;
         this.col = col;
         this.map = map;
-        this.x = (fil * map.size) + 20;
-        this.y = (col * map.size) + 20;
+        this.x = (fil * map.size) + 27;
+        this.y = (col * map.size) - map.size;
     }
 
     show() {
-        circle(this.x, this.y, 20);
-        // image(this.image1, this.x, this.y, 40, 60);
+        image(this.image1, this.x, this.y);
     }
 
     truePosition() {
-        this.x = (this.fil * this.map.size) + 20;
-        this.y = (this.col * this.map.size) + 20;
+        this.x = (this.fil * this.map.size) + 27;
+        this.y = (this.col * this.map.size) - map.size;
     }
-
-    // moveUp() {
-    //     console.log('up');
-    //     console.log(this.map.canMove(this.fil, this.col + 1))
-    //     if(this.map.canMove(this.fil, this.col + 1) === true){
-    //         console.log('entra')
-    //         this.col += 1;
-    //         this.truePosition;
-    //     }
-    // }
-
-    // moveDown() {
-    //     if(this.map.canMove(this.fil, this.col - 1)) {
-    //         this.col -= 1;
-    //         this.truePosition();
-    //     }
-    // }
-
-    // moveLeft() {
-    //     if(this.map.canMove(this.fil - 1, this.col)) {
-    //         this.fil -= 1;
-    //         this.truePosition;
-    //     }
-    // }
-
-    // moveRight() {
-    //     if(this.map.canMove(this.fil + 1, this.col)) {
-    //         this.fil += 1;
-    //         this.truePosition;
-    //     }
-    // }
 
     getFil() {
         return this.fil;
@@ -149,6 +122,19 @@ let pjCol = 8;
 let map;
 let screen = 0;
 
+let tiles;
+let rightColor;
+let color2;
+let color3;
+let screen0;
+let screen1;
+let screen2;
+let screen3;
+
+let win = false;
+let data = false
+
+
 function setup() {
     frameRate(60);
     canvas = createCanvas(windowWidth, windowHeight);
@@ -156,54 +142,61 @@ function setup() {
     canvas.style('position', 'fixed');
     canvas.style('top', '0');
     canvas.style('right', '0');
-    posX = (mapSize * 10)/2;
-    posY = (mapSize * 15)/2;
+    posX = (mapSize * 10) / 2;
+    posY = (mapSize * 15) / 2;
     mupiWidth = windowWidth;
     mupiHeight = windowHeight;
-    background(0);
+    background(255);
 
-    map = new Level(mapSize);
-    pjImage = loadImage("images/pj.png");
+    tiles = loadImage('images/map.png');
+    rightColor = loadImage('images/answer1.png');
+    color2 = loadImage('images/answer2.png');
+    color3 = loadImage('images/answer3.png');
+    pjImage = loadImage('images/Bear.png');
+    screen0 = loadImage('images/mupi1.png');
+    screen1 = loadImage('images/mupi2.png');
+    screen2 = loadImage('images/mupi2.png');
+    screen3 = loadImage('images/data.png');
+
+    map = new Level(mapSize,tiles,rightColor,color2,color3);
     pj = new Player(pjImage, pjFil, pjCol, map);
+    
 }
 
 function draw() {
-    background(0, 5);
-
+    background(255);
+    console.log(screen)
+    
     switch (screen) {
         case 0:
-            fill(255);
-            textSize(30);
-            textAlign(CENTER);
-            text(`
-            Reto Coca - Cola
-            Escanea el QR`, posX, posY);
+            image(screen0, 0, 0, 400);
             break;
-
-
         case 1:
+            image(screen1, 0, 0, 493.71, 720);
+            break;
+        case 2:
+            image(screen2, 0, 0, 493.71, 720);
             map.show();
             fill(254, 0, 26);
             pj.show()
             if (map.win(pj.getFil(), pj.getCol())) {
-                screen = 3
+                win = true;
+                screen++;
+                data = true;
+                changeScreenData();
+            } else if(map.win(pj.getFil(), pj.getCol()) === false){
+                screen++;
+                data = true;
+                changeScreenData();
             }
             break;
 
         case 3:
-            textAlign(CENTER);
-            text(`
-            Ganaste!!
-            para reclamar tu recompensa
-            por favor llena los siguientes datos`, posX, posY);
-            let btn = createButton("llenar datos");
-            btn.mousePressed(function () {
-                screen++;
-            })
-            break;
-
-            case 4:
-                text('datos', posX, posY);
+                image(screen3, 0, 0, 493.71, 720);
+                break;
+    
+        case 4:
+                image(screen4, 0, 0, 493.71, 720);
                 break;
     }
 
@@ -235,21 +228,18 @@ socket.on('mupi-instructions', instructions => {
                 pj.truePosition();
             }
             break;
-
         case 'down':
             if (map.canMove(pj.getFil(), pj.getCol() + 1)) {
                 pj.setCol(pj.getCol() + 1);
                 pj.truePosition();
             }
             break;
-
         case 'left':
             if (map.canMove(pj.getFil() - 1, pj.getCol())) {
                 pj.setFil(pj.getFil() - 1);
                 pj.truePosition();
             }
             break;
-
         case 'right':
             if (map.canMove(pj.getFil() + 1, pj.getCol())) {
                 pj.setFil(pj.getFil() + 1);
@@ -258,3 +248,16 @@ socket.on('mupi-instructions', instructions => {
             }
     }
 })
+
+socket.on('press-play', instructions => {
+    let {
+        playPress
+    } = instructions;
+    if (playPress) {
+        screen = 2;
+    }
+})
+
+function changeScreenData(){
+    socket.emit('data-screen', {data} )
+}
