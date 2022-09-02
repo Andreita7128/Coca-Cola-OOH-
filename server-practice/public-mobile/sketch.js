@@ -53,6 +53,10 @@ let lastNameInput;
 let phoneInput;
 let send;
 let sendI;
+let sendInfo = false;
+
+let winImage;
+let loseImage;
 
 let mark;
 let cocacola;
@@ -87,7 +91,6 @@ function setup() {
 
     mark = loadImage('images/markMobile.png');
     cocacola = loadImage('images/logoMobile.png');
-
 
     socket.emit('device-size', {
         windowWidth,
@@ -153,6 +156,13 @@ function draw() {
     }
 }
 
+function saveUserdata() {
+    postData(NGROK + "/user", userdata).then((data) => {
+        console.log(data);
+    });
+    console.log(userdata);
+}
+
 function nameEvent() {
     userdata.name = this.value();
 }
@@ -176,8 +186,11 @@ function touchStarted() {
             playPress
         })
     }
-    if(screenMobile === 2 && send.click2(107,41)){
-
+    if(send.click2(107,41)){
+        console.log('click')
+        saveUserdata();
+        sendInfo = true;
+        socket.emit('reward', {sendInfo});
     }
 }
 
@@ -208,3 +221,15 @@ socket.on('data-screen', instructions => {
         screenMobile = 2;
     }
 })
+
+const postData = async (url = "", data = {}) => {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    return data;
+  };

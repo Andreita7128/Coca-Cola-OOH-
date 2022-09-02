@@ -35,6 +35,16 @@ io.on('connection', (socket) => {
         console.log(data);
         socket.broadcast.emit('data-screen', data);
     })
+
+    socket.on('reward', sendInfo => {
+        console.log(sendInfo);
+        socket.broadcast.emit('reward', sendInfo);
+    })
 })
+
+app.post(`/user`, (req, res, next) => {
+    console.log(req.body, "THE REQUEST");
+    console.log("POST");
+  });
 
 

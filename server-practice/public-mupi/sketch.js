@@ -28,19 +28,17 @@ class Level {
         for (let i = 0; i < 15; i++) {
             for (let j = 0; j < 11; j++) {
                 if (this.level[i][j] === 0) {
-                    image(this.mapTiles,(j * this.size) + 27, (i * this.size));
+                    image(this.mapTiles, (j * this.size) + 27, (i * this.size));
                 } else if (this.level[i][j] === 2) {
-                    image(this.rightAnswer,(j * this.size) + 27, (i * this.size));
+                    image(this.rightAnswer, (j * this.size) + 27, (i * this.size));
                 } else if (this.level[i][j] === 3) {
-                    image(this.answ2,(j * this.size) + 27, (i * this.size));
+                    image(this.answ2, (j * this.size) + 27, (i * this.size));
                 } else if (this.level[i][j] === 4) {
-                    image(this.answ3,(j * this.size) + 27, (i * this.size));
-                }
-                 else {
+                    image(this.answ3, (j * this.size) + 27, (i * this.size));
+                } else {
                     noStroke();
                 }
-                fill(255,0);
-                stroke(10)
+                fill(255, 0);
                 rect((j * this.size) + 27, (i * this.size), this.size)
             }
         }
@@ -60,7 +58,7 @@ class Level {
         let result = null;
         if (this.level[pcCol][pcFil] === 2) {
             result = true;
-        } else if(this.level[pcCol][pcFil] !== 0 && this.level[pcCol][pcFil] !== 2){
+        } else if (this.level[pcCol][pcFil] !== 0 && this.level[pcCol][pcFil] !== 2) {
             result = false;
         }
         return result;
@@ -131,8 +129,12 @@ let screen1;
 let screen2;
 let screen3;
 
+
 let win = false;
 let data = false
+
+let winImage;
+let loseImage;
 
 
 function setup() {
@@ -155,27 +157,30 @@ function setup() {
     pjImage = loadImage('images/Bear.png');
     screen0 = loadImage('images/mupi1.png');
     screen1 = loadImage('images/mupi2.png');
-    screen2 = loadImage('images/mupi2.png');
+    screen2 = loadImage('images/game.png');
     screen3 = loadImage('images/data.png');
 
-    map = new Level(mapSize,tiles,rightColor,color2,color3);
+    winImage = loadImage('images/win.png');
+    loseImage = loadImage('images/lose.png');
+
+    map = new Level(mapSize, tiles, rightColor, color2, color3);
     pj = new Player(pjImage, pjFil, pjCol, map);
-    
+
 }
 
 function draw() {
     background(255);
     console.log(screen)
-    
+
     switch (screen) {
         case 0:
-            image(screen0, 0, 0, 400);
+            image(screen0, 0, 0, 400, 720);
             break;
         case 1:
             image(screen1, 0, 0, 493.71, 720);
             break;
         case 2:
-            image(screen2, 0, 0, 493.71, 720);
+            image(screen2, 0, 0);
             map.show();
             fill(254, 0, 26);
             pj.show()
@@ -184,7 +189,7 @@ function draw() {
                 screen++;
                 data = true;
                 changeScreenData();
-            } else if(map.win(pj.getFil(), pj.getCol()) === false){
+            } else if (map.win(pj.getFil(), pj.getCol()) === false) {
                 screen++;
                 data = true;
                 changeScreenData();
@@ -192,12 +197,15 @@ function draw() {
             break;
 
         case 3:
-                image(screen3, 0, 0, 493.71, 720);
-                break;
-    
+            image(screen3, 0, 0, 493.71, 720);
+            break;
+
         case 4:
-                image(screen4, 0, 0, 493.71, 720);
-                break;
+            image(winImage, 0, 0, 493.71, 720);
+            break;
+        case 5:
+            image(loseImage, 0, 0, 493.71, 720);
+            break;
     }
 
 }
@@ -258,6 +266,23 @@ socket.on('press-play', instructions => {
     }
 })
 
-function changeScreenData(){
-    socket.emit('data-screen', {data} )
+socket.on('reward', instructions => {
+    let {
+        sendInfo
+    } = instructions;
+    console.log(win)
+    if (sendInfo && screen === 3) {
+        console.log(sendInfo)
+        if (win !== false) {
+            screen = 4;
+        } else {
+            screen = 5;
+        }
+    }
+})
+
+function changeScreenData() {
+    socket.emit('data-screen', {
+        data
+    })
 }
