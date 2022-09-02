@@ -1,17 +1,17 @@
 class Level {
-    constructor(size, mapTiles, rightAnswer, answ2, answ3) {
+    constructor(size, mapTiles, rightAnswer, answ2, answ3, water) {
         this.level = [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 0, 2, 0, 1, 1, 1, 0, 3, 0, 1],
-            [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1],
+            [1, 5, 1, 5, 1, 1, 1, 5, 1, 5, 1],
+            [1, 0, 5, 0, 5, 0, 5, 0, 5, 0, 1],
+            [1, 5, 1, 5, 1, 1, 1, 5, 1, 5, 1],
+            [1, 0, 5, 0, 5, 0, 5, 0, 5, 0, 1],
+            [1, 1, 1, 5, 1, 0, 1, 5, 1, 1, 1],
             [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-            [1, 1, 1, 0, 0, 4, 0, 0, 1, 1, 1],
+            [1, 1, 1, 5, 0, 4, 0, 5, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -22,6 +22,7 @@ class Level {
         this.rightAnswer = rightAnswer;
         this.answ2 = answ2;
         this.answ3 = answ3;
+        this.water = water;
     }
 
     show() {
@@ -35,7 +36,10 @@ class Level {
                     image(this.answ2, (j * this.size) + 27, (i * this.size));
                 } else if (this.level[i][j] === 4) {
                     image(this.answ3, (j * this.size) + 27, (i * this.size));
-                } else {
+                } else if(this.level[i][j] === 5){
+                    image(this.water, (j * this.size) + 27, (i * this.size));
+                }
+                else {
                     noStroke();
                 }
                 fill(255, 0);
@@ -58,7 +62,7 @@ class Level {
         let result = null;
         if (this.level[pcCol][pcFil] === 2) {
             result = true;
-        } else if (this.level[pcCol][pcFil] !== 0 && this.level[pcCol][pcFil] !== 2) {
+        } else if (this.level[pcCol][pcFil] !== 0 && this.level[pcCol][pcFil] !== 2 && this.level[pcCol][pcFil] !== 5) {
             result = false;
         }
         return result;
@@ -124,6 +128,7 @@ let tiles;
 let rightColor;
 let color2;
 let color3;
+let water;
 let screen0;
 let screen1;
 let screen2;
@@ -154,6 +159,7 @@ function setup() {
     rightColor = loadImage('images/answer1.png');
     color2 = loadImage('images/answer2.png');
     color3 = loadImage('images/answer3.png');
+    water = loadImage('images/water.png');
     pjImage = loadImage('images/Bear.png');
     screen0 = loadImage('images/mupi1.png');
     screen1 = loadImage('images/mupi2.png');
@@ -163,7 +169,7 @@ function setup() {
     winImage = loadImage('images/win.png');
     loseImage = loadImage('images/lose.png');
 
-    map = new Level(mapSize, tiles, rightColor, color2, color3);
+    map = new Level(mapSize, tiles, rightColor, color2, color3, water);
     pj = new Player(pjImage, pjFil, pjCol, map);
 
 }
@@ -174,10 +180,10 @@ function draw() {
 
     switch (screen) {
         case 0:
-            image(screen0, 0, 0, 400, 720);
+            image(screen0, 0, 0, 400, 700);
             break;
         case 1:
-            image(screen1, 0, 0, 493.71, 720);
+            image(screen1, 0, 0, 493.71, 700);
             break;
         case 2:
             image(screen2, 0, 0);
@@ -197,14 +203,14 @@ function draw() {
             break;
 
         case 3:
-            image(screen3, 0, 0, 493.71, 720);
+            image(screen3, 0, 0, 493.71, 700);
             break;
 
         case 4:
-            image(winImage, 0, 0, 493.71, 720);
+            image(winImage, 0, 0, 493.71, 700);
             break;
         case 5:
-            image(loseImage, 0, 0, 493.71, 720);
+            image(loseImage, 0, 0, 493.71, 700);
             break;
     }
 

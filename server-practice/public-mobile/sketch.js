@@ -64,7 +64,7 @@ let cocacola;
 let userdata = {name: undefined, lastName: undefined, phone: undefined};
 
 function setup() {
-    frameRate(12);
+    frameRate(1);
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.style('z-index', '-1');
     canvas.style('position', 'fixed');
