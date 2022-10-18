@@ -32,11 +32,6 @@ let socket = io(NGROK, {
 });
 
 let isTouched = false;
-let addPos = 70;
-let play;
-let playI;
-let playPress = false;
-let screenMobile = 0;
 
 let nameInput;
 let lastNameInput;
@@ -44,9 +39,6 @@ let phoneInput;
 let send;
 let sendI;
 let sendInfo = false;
-
-let mark;
-let cocacola;
 
 let userdata = {name: undefined, lastName: undefined, phone: undefined};
 
@@ -66,9 +58,6 @@ function setup() {
     sendI = loadImage('images/send.png')
 
     send = new Button(positionX - 53, positionY + addPos, sendI);
-
-    mark = loadImage('images/markMobile.png');
-    cocacola = loadImage('images/logoMobile.png');
 
     socket.emit('device-size', {
         windowWidth,
@@ -96,24 +85,15 @@ function setup() {
 }
 
 function draw() {
-    background(0, 5);
-    fill(254, 0, 26);
-    console.log(screenMobile);
-    fill(255);
-    noStroke();
-    rect(0, 0, windowWidth, windowHeight)
-    image(mark, 0, windowHeight/2 + 150,windowWidth);
-    image(cocacola, windowWidth/2 + 100, windowHeight/2 + 200)
-
-    
+    background(0, 5);    
 }
-
+/*
 function saveUserdata() {
     postData(NGROK + "/user", userdata).then((data) => {
         console.log(data);
     });
     console.log(userdata);
-}
+}*/
 
 function nameEvent() {
     userdata.name = this.value();
@@ -129,28 +109,14 @@ function phoneEvent() {
 
 function touchStarted() {
     isTouched = true;
-    if (screenMobile === 0 && play.click2(107, 41)) {
-        playPress = true;
-    }
-    if (screenMobile === 0 && playPress) {
-        screenMobile++;
-        socket.emit('press-play', {
-            playPress
-        })
-    }
-    if(send.click2(107,41)){
-        console.log('click')
-        saveUserdata();
-        sendInfo = true;
-        socket.emit('reward', {sendInfo});
-    }
+    
 }
 
 function touchEnded() {
     isTouched = false;
 
 }
-
+/*
 const postData = async (url = "", data = {}) => {
     const response = await fetch(url, {
       method: "POST",
@@ -161,4 +127,4 @@ const postData = async (url = "", data = {}) => {
       body: JSON.stringify(data),
     });
     return data;
-  };
+  };*/
