@@ -65,4 +65,9 @@ ioServer.on('connection', (socket) => {
         console.log('point: ' + orderForArduino);
     });
 
+    socket.on('dataCollect', sendInfo => {
+        console.log(sendInfo);
+        socket.broadcast.emit('dataCollect', sendInfo);
+    })
+
 });
