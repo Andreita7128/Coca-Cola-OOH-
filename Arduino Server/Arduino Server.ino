@@ -25,7 +25,7 @@ void loop() {
   if (potenValue != previousPotenValue) {
     sendMessage(potenValue, dist);
     previousPotenValue = potenValue;
-  }
+  }  
 
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);

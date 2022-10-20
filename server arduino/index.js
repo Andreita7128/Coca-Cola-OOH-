@@ -15,7 +15,7 @@ app.use(express.json());
 
 //⚙️ SERIAL COMMUNICATION SETUP -------------------------------------------------
 const protocolConfiguration = { // *New: Defining Serial configurations
-    path: '/COM5', //*Change this COM# or usbmodem#####
+    path: '/COM4', //*Change this COM# or usbmodem#####
     baudRate: 9600
 };
 const port = new SerialPort(protocolConfiguration);

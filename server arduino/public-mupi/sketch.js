@@ -26,7 +26,9 @@ let countCan = 0;
 let obstacles = [];
 let obstacleImage;
 
-let screen = 2;
+let screen = 0;
+let score = 0;
+
 
 let screen0;
 let screen3;
@@ -50,9 +52,8 @@ let poten = 50;
 let potenPrevious = poten;
 let dist = 0;
 
-let score = 0;
 
-let photo;
+let photo = [];
 let photoScreen = 0;
 
 function preload() {}
@@ -84,7 +85,7 @@ function setup() {
     }
 
     for (let i = 13; i < 17; i++) {
-        instructions.push(loadImage(`images/${i}.png`))
+        photo.push(loadImage(`images/${i}.png`))
         console.log(instructions)
     }
 
@@ -112,9 +113,9 @@ function draw() {
             break;
         case 1:
             image(instructions[ins], 0, 0);
-            setTimeout(() => {
+            if(frameCount  % 180 === 0){
                 next = true;
-            }, 3000);
+            }
             if (potenPrevious !== poten && next) {
                 ins++;
                 potenPrevious = poten;
@@ -167,9 +168,9 @@ function draw() {
             textSize(50);
             text(`${canSave}/10`, 1205, mupiHeight - 110);
             text(`x${pj.getLives()}`, 1290, 125);
-            text(score, 1000, 200)
+            //text(score, 1000, 200)
 
-            if (canSave === 10) {
+            if (canSave === 10 || pj.getLives() === 0) {
                 screen = 3;
             }
 
@@ -186,32 +187,36 @@ function draw() {
             image(scan, 0, 0);
             break;
         case 5:
-            if (score === 100) {
+            if (score > 70) {
                 image(winImage, 0, 0);
-                setTimeout(() => {
+
+                if(frameCount  % 180 === 0){
                     screen = 6;
-                }, 3000);
+                }
             } else {
                 image(loseImage, 0, 0);
-                setTimeout(() => {
+                if(frameCount  % 180 === 0){
                     screen = 8;
-                }, 3000);
+                }
             }
             break;
 
         case 6:
             image(photo[photoScreen], 0, 0);
-            setTimeout(() => {
-                photoScreen++;
+
+            if(frameCount  % 180 === 0){
                 screen = 7;
-            }, 3000);
+                photoScreen++
+            }
+          
             break;
 
             case 7:
             image(photo[photoScreen], 0, 0);
-            setTimeout(() => {
-                photoScreen++;
-            }, 3000);
+            if(frameCount  % 180 === 0){
+                photoScreen = 2;
+            }
+          
             break;
 
             case 8:
