@@ -15,54 +15,34 @@ let pjImageRight;
 let pjImageLeft;
 let startMove = false;
 
-let cans = [];
+let items = [];
 let canImage;
-let car1;
-let car2;
 let countGodCan = 0;
-let countObstacle = 0;
-let countCan = 0;
-
 let obstacles = [];
 let obstacleImage;
+let car1;
+let car2;
+let countObstacle = 0;
+let countItem = 0;
 
 let screen = 0;
 let score = 0;
-
-
-let screen0;
-let screen3;
-let scan;
-
-let instructions = [];
-let ins = 0;
+let imagesScreen = [];
+let imageActual = 1;
 let next = false;
 
-let street;
 let gui;
 let canSave = 0;
 
-let win = false;
-let data = false
-
-let winImage;
-let loseImage;
-
 let poten = 50;
 let potenPrevious = poten;
-let dist = 0;
-
-
-let photo = [];
-let photoScreen = 0;
+let arduinoDist = 0;
 
 function preload() {}
 
 function setup() {
     frameRate(60);
     createCanvas(mupiWidth, mupiHeight);
-
-
 
     pjX = mupiWidth / 2;
     pjY = mupiHeight - 407;
@@ -71,31 +51,13 @@ function setup() {
     pjImageLeft = loadImage('images/carLeft.png');
 
     canImage = loadImage('images/canGod.png');
-    car1 = loadImage('images/canBad.png')
-
-    screen0 = loadImage('images/1.png');
-    street = loadImage('images/8.png');
-    gui = loadImage('images/gui.png');
-    screen3 = loadImage('images/9.png');
-    scan = loadImage('images/10.png');
-
-    for (let i = 2; i < 8; i++) {
-        instructions.push(loadImage(`images/${i}.png`))
-        console.log(instructions)
-    }
-
-    for (let i = 13; i < 17; i++) {
-        photo.push(loadImage(`images/${i}.png`))
-        console.log(instructions)
-    }
-
     car1 = loadImage('images/car1.png');
     car2 = loadImage('images/car2.png');
+    gui = loadImage('images/gui.png');
 
-
-
-    winImage = loadImage('images/11.png');
-    loseImage = loadImage('images/12.png');
+    for (let i = 1; i < 17; i++) {
+        imagesScreen.push(loadImage(`images/${i}.png`));
+    }
 
     pj = new Player(pjX, pjY, mupiWidth, pjImageFront, pjImageRight, pjImageLeft);
 
@@ -106,122 +68,131 @@ function draw() {
 
     switch (screen) {
         case 0:
-            image(screen0, 0, 0);
-            if (dist > 0 && dist < 30) {
+            image(imagesScreen[0], 0, 0);
+
+            if (arduinoDist > 0 && arduinoDist < 30) {
                 screen = 1;
             }
             break;
         case 1:
-            image(instructions[ins], 0, 0);
-            if(frameCount  % 180 === 0){
+            image(imagesScreen[imageActual], 0, 0);
+
+            if (frameCount % 240 === 0) {
                 next = true;
             }
             if (potenPrevious !== poten && next) {
-                ins++;
+                imageActual++;
                 potenPrevious = poten;
                 next = false;
             }
-            if (ins === 5) {
+            if (imageActual === 7) {
                 screen = 2;
             }
             break;
         case 2:
-            image(street, 0, 0);
-            image(gui, 0, 0);
+            image(imagesScreen[7], 0, 0);
 
             setTimeout(() => {
                 startMove = true;
             }, 3000);
 
             if (poten > 50 && startMove) {
-                potenPrevious = poten;
                 pj.moveRight();
             }
 
             if (poten < 50 && startMove) {
-                potenPrevious = poten;
                 pj.moveLeft();
             }
 
-            console.log(mouseX, pj.x)
+            randomItem();
 
-            randomCollectable();
-            cans.forEach(element => {
+            items.forEach(element => {
                 element.show();
                 element.move();
                 if (element.near(pj.getX(), pj.getY()) && element.getType() === 0) {
                     canSave += 1;
                     score += 10;
-                    cans.splice(element, 1);
+                    items.splice(element, 1);
                 }
 
                 if (element.near(pj.getX(), pj.getY()) && element.getType() === 1) {
                     pj.loseLive();
                     score -= 20;
-                    cans.splice(element, 1);
+                    items.splice(element, 1);
                 }
             });
 
             pj.show();
+            image(gui, 0, 0);
 
             fill(255);
-            textSize(50);
-            text(`${canSave}/10`, 1205, mupiHeight - 110);
-            text(`x${pj.getLives()}`, 1290, 125);
-            //text(score, 1000, 200)
+            textSize(40);
+            text(`${canSave}/10`, 1025, 105);
+            text(`x${pj.getLives()}`, 1300, 105);
+            text(score, 790, 105)
 
-            if (canSave === 10 || pj.getLives() === 0) {
+            if (canSave === 10) {
                 screen = 3;
+            }
+
+            if (pj.getLives() === 0) {
+                screen = 4;
+                score = 0;
             }
 
             break;
 
         case 3:
-            image(screen3, 0, 0);
+            image(imagesScreen[8], 0, 0);
             setTimeout(() => {
-                screen = 4;
-            }, 2000);
+                screen = 5;
+            }, 3000);
             break;
 
         case 4:
-            image(scan, 0, 0);
+            image(imagesScreen[9], 0, 0);
+            setTimeout(() => {
+                screen = 5;
+            }, 4000);
             break;
-        case 5:
-            if (score > 70) {
-                image(winImage, 0, 0);
 
-                if(frameCount  % 180 === 0){
-                    screen = 6;
-                }
-            } else {
-                image(loseImage, 0, 0);
-                if(frameCount  % 180 === 0){
-                    screen = 8;
-                }
-            }
+        case 5:
+            image(imagesScreen[10], 0, 0);
             break;
 
         case 6:
-            image(photo[photoScreen], 0, 0);
+            if (score > 70) {
+                image(imagesScreen[11], 0, 0);
 
-            if(frameCount  % 180 === 0){
-                screen = 7;
-                photoScreen++
+                if (frameCount % 300 === 0) {
+                    screen = 7;
+                }
+            } else {
+                image(imagesScreen[15], 0, 0);
             }
-          
             break;
 
-            case 7:
-            image(photo[photoScreen], 0, 0);
-            if(frameCount  % 180 === 0){
-                photoScreen = 2;
+        case 7:
+            image(imagesScreen[12], 0, 0);
+
+            if (frameCount % 500 === 0) {
+                screen = 8;
+                imageActual = 13;
             }
-          
+
             break;
 
-            case 8:
-            image(photo[3], 0, 0);
-           
+        case 8:
+            image(imagesScreen[imageActual], 0, 0);
+            if (frameCount % 400 === 0) {
+                screen = 9;
+            }
+
+            break;
+
+        case 9:
+            image(imagesScreen[14], 0, 0);
+
             break;
     }
 }
@@ -229,9 +200,9 @@ function draw() {
 socket.on('messageArduino', (arduinoMessage) => {
 
     poten = arduinoMessage.poten;
-    dist = arduinoMessage.dist;
+    arduinoDist = arduinoMessage.arduinoDist;
 
-    console.log(poten);
+    //  console.log(poten);
 
 });
 
@@ -239,10 +210,8 @@ socket.on('dataCollect', instructions => {
     let {
         sendInfo
     } = instructions;
-    console.log(win)
     if (sendInfo) {
-        console.log(sendInfo)
-        screen = 5;
+        screen = 6;
 
     }
 })
@@ -251,20 +220,15 @@ function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }
 
-
-function changeScreenData() {
-
-}
-
-function randomCollectable() {
-    if (frameCount % 150 === 0 && countCan <= 30) {
+function randomItem() {
+    if (frameCount % 150 === 0 && countItem <= 30) {
         const num = Math.round(random(1));
-        const x = Math.floor(random(mupiWidth - 76));
+        const x = Math.floor(random(mupiWidth - 120));
         const y = -20;
 
         switch (num) {
             case 0:
-                cans.push(new Collectable(x, y, canImage, 76, 154, 0));
+                items.push(new Item(x, y, canImage, 76, 154, 0));
                 countGodCan++;
                 break;
             case 1:
@@ -276,23 +240,23 @@ function randomCollectable() {
         if (countObstacle === 15) {
             num = 0;
         }
-        countCan++;
+        countItem++;
     }
 }
 
 function randomCar() {
 
     let chooseCar = Math.round(random(1));
-    const x = Math.floor(random(mupiWidth - 90));
+    const x = Math.floor(random(mupiWidth - 120));
     const y = -20;
 
     switch (chooseCar) {
         case 0:
-            cans.push(new Collectable(x, y, car1, 151, 237, 1));
+            items.push(new Item(x, y, car1, 151, 237, 1));
             break;
 
         case 1:
-            cans.push(new Collectable(x, y, car2, 151, 237, 1));
+            items.push(new Item(x, y, car2, 151, 237, 1));
 
             break;
     }

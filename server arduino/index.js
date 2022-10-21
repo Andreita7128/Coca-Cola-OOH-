@@ -15,7 +15,7 @@ app.use(express.json());
 
 //⚙️ SERIAL COMMUNICATION SETUP -------------------------------------------------
 const protocolConfiguration = { // *New: Defining Serial configurations
-    path: '/COM4', //*Change this COM# or usbmodem#####
+    path: '/COM5', //*Change this COM# or usbmodem#####
     baudRate: 9600
 };
 const port = new SerialPort(protocolConfiguration);
@@ -43,7 +43,7 @@ parser.on('data', (arduinoData) => {
 
     let arduinoMessage = {
         poten: dataArray[0],
-        dist: dataArray[1]
+        arduinoDist: dataArray[1]
     }
 
     console.log(arduinoMessage);
