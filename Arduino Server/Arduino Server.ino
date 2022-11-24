@@ -20,7 +20,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  potenValue = map(analogRead(POTEN_PIN), 0, 1023, 100, 0);
+  potenValue = map(analogRead(POTEN_PIN), 0, 1023, 50, 0);
 
   if (potenValue != previousPotenValue) {
     sendMessage(potenValue, dist);

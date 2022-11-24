@@ -11,8 +11,6 @@ let mupiHeight = 1024;
 let pj;
 let pjX, pjY = 0;
 let pjImageFront;
-let pjImageRight;
-let pjImageLeft;
 let startMove = false;
 
 let items = [];
@@ -25,7 +23,7 @@ let car2;
 let countObstacle = 0;
 let countItem = 0;
 
-let screen = 0;
+let screen = "Home";
 let score = 0;
 let imagesScreen = [];
 let imageActual = 1;
@@ -38,6 +36,11 @@ let poten = 50;
 let potenPrevious = poten;
 let arduinoDist = 0;
 
+let startGif = true;
+let gifStart;
+
+let instructions1 = true;
+
 function preload() {}
 
 function setup() {
@@ -47,60 +50,59 @@ function setup() {
     pjX = mupiWidth / 2;
     pjY = mupiHeight - 407;
     pjImageFront = loadImage('images/carFront.png');
-    pjImageRight = loadImage('images/carRight.png');
-    pjImageLeft = loadImage('images/carLeft.png');
 
     canImage = loadImage('images/canGod.png');
     car1 = loadImage('images/car1.png');
     car2 = loadImage('images/car2.png');
     gui = loadImage('images/gui.png');
+    gifStart = loadImage('images/start.png')
 
-    for (let i = 1; i < 17; i++) {
+    for (let i = 1; i < 14; i++) {
         imagesScreen.push(loadImage(`images/${i}.png`));
     }
 
-    pj = new Player(pjX, pjY, mupiWidth, pjImageFront, pjImageRight, pjImageLeft);
-
+    pj = new Player(pjX, pjY, mupiWidth, pjImageFront);
 }
 
 function draw() {
     background(255);
 
     switch (screen) {
-        case 0:
+        case "Home":
             image(imagesScreen[0], 0, 0);
 
             if (arduinoDist > 0 && arduinoDist < 30) {
-                screen = 1;
+                screen = "Game";
             }
             break;
-        case 1:
-            image(imagesScreen[imageActual], 0, 0);
+        case "Game":
+            let potenValueMedium = 25;
+            image(imagesScreen[1], 0, 0);
 
-            if (frameCount % 240 === 0) {
-                next = true;
+            if (instructions1) {
+                imageMode(CENTER)
+                image(imagesScreen[10], mupiWidth / 2, mupiHeight / 2)
+                imageMode(CORNER)
             }
-            if (potenPrevious !== poten && next) {
-                imageActual++;
-                potenPrevious = poten;
-                next = false;
-            }
-            if (imageActual === 7) {
-                screen = 2;
-            }
-            break;
-        case 2:
-            image(imagesScreen[7], 0, 0);
-
             setTimeout(() => {
+                instructions1 = false
                 startMove = true;
-            }, 3000);
+            }, 4000);
 
-            if (poten > 50 && startMove) {
+            if (startGif) {
+                imageMode(CENTER)
+                image(gifStart, mupiWidth / 2, mupiHeight / 2)
+                imageMode(CORNER)
+            }
+            // setTimeout(() => {
+            //     startMove = true;
+            // }, 3000);
+
+            if (poten > potenValueMedium && startMove) {
                 pj.moveRight();
             }
 
-            if (poten < 50 && startMove) {
+            if (poten < potenValueMedium && startMove) {
                 pj.moveLeft();
             }
 
@@ -121,8 +123,9 @@ function draw() {
                     items.splice(element, 1);
                 }
             });
-
-            pj.show();
+            if (startMove) {
+                pj.show();
+            }
             image(gui, 0, 0);
 
             fill(255);
@@ -132,66 +135,66 @@ function draw() {
             text(score, 790, 105)
 
             if (canSave === 10) {
-                screen = 3;
+                screen = "Finish";
             }
 
             if (pj.getLives() === 0) {
-                screen = 4;
+                screen = "Lost";
                 score = 0;
             }
 
             break;
 
-        case 3:
-            image(imagesScreen[8], 0, 0);
+        case "Finish":
+            image(imagesScreen[2], 0, 0);
             setTimeout(() => {
-                screen = 5;
+                screen = "Scan";
             }, 3000);
             break;
 
-        case 4:
-            image(imagesScreen[9], 0, 0);
+        case "Lost":
+            image(imagesScreen[3], 0, 0);
             setTimeout(() => {
-                screen = 5;
+                screen = "Scan";
             }, 4000);
             break;
 
-        case 5:
-            image(imagesScreen[10], 0, 0);
+        case "Scan":
+            image(imagesScreen[4], 0, 0);
             break;
 
-        case 6:
+        case "Win":
             if (score > 70) {
-                image(imagesScreen[11], 0, 0);
+                image(imagesScreen[5], 0, 0);
 
                 if (frameCount % 300 === 0) {
-                    screen = 7;
+                    screen = "Photo";
                 }
             } else {
-                image(imagesScreen[15], 0, 0);
+                image(imagesScreen[9], 0, 0);
             }
             break;
 
-        case 7:
-            image(imagesScreen[12], 0, 0);
+        case "Photo":
+            image(imagesScreen[6], 0, 0);
 
             if (frameCount % 500 === 0) {
-                screen = 8;
-                imageActual = 13;
+                screen = "Create";
+                imageActual = 10;
             }
 
             break;
 
-        case 8:
-            image(imagesScreen[imageActual], 0, 0);
+        case "Create":
+            image(imagesScreen[7], 0, 0);
             if (frameCount % 400 === 0) {
-                screen = 9;
+                screen = "Reward";
             }
 
             break;
 
-        case 9:
-            image(imagesScreen[14], 0, 0);
+        case "Reward":
+            image(imagesScreen[8], 0, 0);
 
             break;
     }
@@ -211,7 +214,7 @@ socket.on('dataCollect', instructions => {
         sendInfo
     } = instructions;
     if (sendInfo) {
-        screen = 6;
+        screen = "Win";
 
     }
 })
@@ -223,7 +226,7 @@ function windowResized() {
 function randomItem() {
     if (frameCount % 150 === 0 && countItem <= 30) {
         const num = Math.round(random(1));
-        const x = Math.floor(random(mupiWidth - 120));
+        const x = Math.floor(random(mupiWidth - 300));
         const y = -20;
 
         switch (num) {
