@@ -39,7 +39,15 @@ let arduinoDist = 0;
 let startGif = true;
 let gifStart;
 
+let potenValueMedium = 25;
 let instructions1 = true;
+let instructions2 = false;
+let instructions3 = false;
+let instructionsReady = false;
+let sendCupon = false;
+let choque;
+let boomCar = false;
+
 
 function preload() {}
 
@@ -55,7 +63,8 @@ function setup() {
     car1 = loadImage('images/car1.png');
     car2 = loadImage('images/car2.png');
     gui = loadImage('images/gui.png');
-    gifStart = loadImage('images/start.png')
+    gifStart = loadImage('images/start.gif');
+    choque = loadImage('images/choque.png');
 
     for (let i = 1; i < 14; i++) {
         imagesScreen.push(loadImage(`images/${i}.png`));
@@ -72,12 +81,14 @@ function draw() {
             image(imagesScreen[0], 0, 0);
 
             if (arduinoDist > 0 && arduinoDist < 30) {
-                screen = "Game";
+                screen = "GameInstructions1";
             }
             break;
-        case "Game":
-            let potenValueMedium = 25;
+        case "GameInstructions1":
+
             image(imagesScreen[1], 0, 0);
+            movePJ();
+            showPJ()
 
             if (instructions1) {
                 imageMode(CENTER)
@@ -89,23 +100,97 @@ function draw() {
                 startMove = true;
             }, 4000);
 
+            if (frameCount % 600 === 0) {
+                instructions2 = true;
+                startMove = false;
+                screen = "GameInstructions2";
+            }
+
+
+
+            break;
+        case "GameInstructions2":
+            image(imagesScreen[1], 0, 0);
+            movePJ();
+            showPJ();
+
+            if (instructions2) {
+                imageMode(CENTER)
+                image(imagesScreen[11], mupiWidth / 2, mupiHeight / 2 + 50)
+                imageMode(CORNER)
+            }
+
+            if (frameCount % 250 === 0) {
+                instructions2 = false
+                startMove = true;
+                randomCar();
+            }
+
+            items.forEach(element => {
+                element.show();
+                element.move();
+
+                if (element.near(pj.getX(), pj.getY()) && element.getType() === 1) {
+                    items.splice(element, 1);
+                    boomCar = true;
+                }
+            });
+
+            if (boomCar) {
+                imageMode(CENTER)
+                image(choque, mupiWidth / 2, mupiHeight / 2)
+                imageMode(CORNER)
+            }
+
+            if (frameCount % 100 === 0 && boomCar) {
+                boomCar = false;
+            }
+
+
+            if (frameCount % 2000 === 0) {
+                instructions3 = true;
+                startMove = false;
+                screen = "GameInstructions3";
+            }
+
+            image(gui, 0, 0);
+
+            break;
+
+        case "GameInstructions3":
+            image(imagesScreen[1], 0, 0);
+            movePJ();
+
+            if (instructions3) {
+                imageMode(CENTER)
+                image(imagesScreen[12], mupiWidth / 2, mupiHeight / 2 + 50)
+                imageMode(CORNER)
+            }
+
+            if (frameCount % 250 === 0) {
+                instructions3 = false
+                startMove = false;
+                screen = "Game";
+            }
+
+            image(gui, 0, 0);
+
+            break;
+
+        case "Game":
+            image(imagesScreen[1], 0, 0);
+            movePJ();
+
             if (startGif) {
                 imageMode(CENTER)
                 image(gifStart, mupiWidth / 2, mupiHeight / 2)
                 imageMode(CORNER)
             }
-            // setTimeout(() => {
-            //     startMove = true;
-            // }, 3000);
 
-            if (poten > potenValueMedium && startMove) {
-                pj.moveRight();
+            if (frameCount % 400 === 0) {
+                startMove = true;
+                startGif = false;
             }
-
-            if (poten < potenValueMedium && startMove) {
-                pj.moveLeft();
-            }
-
             randomItem();
 
             items.forEach(element => {
@@ -121,11 +206,22 @@ function draw() {
                     pj.loseLive();
                     score -= 20;
                     items.splice(element, 1);
+                    boomCar = true;
                 }
             });
-            if (startMove) {
-                pj.show();
+
+            if (boomCar) {
+                imageMode(CENTER)
+                image(choque, mupiWidth / 2, mupiHeight / 2)
+                imageMode(CORNER)
             }
+
+            if (frameCount % 100 === 0 && boomCar) {
+                boomCar = false;
+            }
+            
+            showPJ();
+
             image(gui, 0, 0);
 
             fill(255);
@@ -142,7 +238,6 @@ function draw() {
                 screen = "Lost";
                 score = 0;
             }
-
             break;
 
         case "Finish":
@@ -171,8 +266,16 @@ function draw() {
                     screen = "Photo";
                 }
             } else {
+                let cupones = {
+                    cupones: "+1"
+                }
                 image(imagesScreen[9], 0, 0);
+                if (sendCupon === false) {
+                    sendUserData(cupones);
+                    sendCupon = true;
+                }
             }
+
             break;
 
         case "Photo":
@@ -269,4 +372,33 @@ function changeScreenData() {
     socket.emit('data-screen', {
         data
     })
+}
+async function sendUserData(lead) {
+    const request = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(lead),
+    }
+    await fetch(
+        "https://94ff-2800-e2-4b80-8fa-6c97-7573-14bd-2aca.ngrok.io/add-new-cupon",
+        request
+    )
+}
+
+function movePJ() {
+    if (poten > potenValueMedium && startMove) {
+        pj.moveRight();
+    }
+
+    if (poten < potenValueMedium && startMove) {
+        pj.moveLeft();
+    }
+}
+
+function showPJ() {
+    if (startMove) {
+        pj.show();
+    }
 }
